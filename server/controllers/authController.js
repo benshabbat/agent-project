@@ -1,0 +1,50 @@
+import Agent from "../models/Agent.js";
+import bcrypt from "bcrypt";
+const atbashCipher = (str) => {
+  return str
+    .split("")
+    .map((char) => {
+      if (char >= "a" && char <= "z") {
+        return String.fromCharCode(
+          "z".charCodeAt(0) - (char.charCodeAt(0) - "a".charCodeAt(0)),
+        );
+      } else if (char >= "A" && char <= "Z") {
+        return String.fromCharCode(
+          "Z".charCodeAt(0) - (char.charCodeAt(0) - "A".charCodeAt(0)),
+        );
+      } else {
+        return char;
+      }
+    })
+    .join("");
+};
+
+//register 
+export const register = async (req, res) => {
+  const { agentCode, fullName, ...rest } = req.body;
+  if (!agentCode || !fullName) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  const isExistAgent = await Agent.findOne({ agentCode });
+  if (isExistAgent) {
+    return res.status(400).json({ message: "Agent code already exists" });
+  }
+  const passwordAtbash = atbashCipher(fullName);
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(passwordAtbash, salt);
+
+  await Agent.create({
+    agentCode,
+    fullName,
+    passwordHash: hashPassword,
+    ...rest,
+  });
+
+  res
+    .status(200)
+    .json({
+      message: "Registration successful",
+      yourFirstPassword: passwordAtbash,
+
+    });
+};
