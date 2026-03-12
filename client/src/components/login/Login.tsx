@@ -1,17 +1,24 @@
 import { useState } from "react";
-import { loginRequest, type LoginForm } from "../../services/authServices";
+import {type LoginForm } from "../../services/authServices";
+import { useNavigate } from "react-router";
+import { useAuthStore } from "../../store/useAuthStore";
 
 function Login() {
+
+const {user, login} = useAuthStore();
+
 const [formData, setFormData] = useState<LoginForm>({
   agentCode: '',
   password: ''
 });
-
+const navigate = useNavigate()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = await loginRequest(formData);
-    console.log(data);
+    await login(formData);
+    console.log(user);
+    navigate("/");
+    
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

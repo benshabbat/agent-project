@@ -1,47 +1,22 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { loginRequest, type LoginForm } from '../services/authServices';
 
-// Define the shape of the user data
-interface User {
-  email: string;
-  id: string;
-  name?: string; // Optional name field
+type Role = "admin"|"agent"
+
+interface User{
+  role:Role;
+  agentCode:string;
+  password:string;
+  fullName:string;
+}
+interface AuthState {
+  user:User|null;
+  login: (form:LoginForm)=> Promise<User|null|unknown>;
 }
 
-// Define the shape of the store's state and actions
-interface AuthStoreState {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (userData: User, token: string) => void;
-  logout: () => void;
-}
 
-const useAuthStore = create<AuthStoreState>()(
-  // Use 'persist' middleware to keep the state in localStorage
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      
-      login: (userData) => {
-        set({
-          user: userData,
-          isAuthenticated: true,
-        });
-      },
-      
-      logout: () => {
-        set({
-          user: null,
-          isAuthenticated: false,
-        });
-      },
-    }),
-    {
-      name: 'user-auth-storage', // name of the item in the local storage
-      storage: createJSONStorage(() => localStorage), // Use localStorage for storage
-    }
-  )
-);
-
-export default useAuthStore;
+export const useAuthStore = create<AuthState>()(persist((set)=>({
+  user: null,
+  login : async (form:LoginForm) =>set({ user: await loginRequest(form)}),
+}), {name: 'auth-storage'}))
