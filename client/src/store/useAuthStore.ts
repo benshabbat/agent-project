@@ -7,9 +7,10 @@ type Role = "admin"|"agent"
 interface User{
   role:Role;
   agentCode:string;
-  password:string;
+  passwordHash:string;
   fullName:string;
 }
+
 interface AuthState {
   user:User|null;
   login: (form:LoginForm)=> Promise<User|null|unknown>;

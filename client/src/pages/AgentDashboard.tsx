@@ -1,3 +1,4 @@
+import { useAuthStore } from "../store/useAuthStore"
 
 
 function AgentDashboard() {
@@ -5,9 +6,9 @@ function AgentDashboard() {
   const {user}=useAuthStore()
   return (
     <div>
-      <h2>{user.agentCode}</h2>
-      <p>{user.fullName}</p>
-      <p>{user.role}</p>
+      <h2>{user?.agentCode}</h2>
+      <p>{user?.fullName}</p>
+      <p>{user?.role}</p>
     </div>
   )
 }
