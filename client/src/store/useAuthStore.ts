@@ -5,9 +5,9 @@ import { loginRequest, type LoginForm } from '../services/authServices';
 type Role = "admin"|"agent"
 
 interface User{
+  id:string;
   role:Role;
   agentCode:string;
-  passwordHash:string;
   fullName:string;
 }
 
