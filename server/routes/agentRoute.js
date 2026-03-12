@@ -1,11 +1,12 @@
 import express from 'express';
-import { getAgents } from '../controllers/agentController';
+import { getAgents,getAgentById} from '../controllers/agentController.js';
 
 
 
 const router = express.Router();
 
 //get all agents
-router.get('/agents', getAgents);
+router.get('/', getAgents);
+router.get('/:id', getAgentById);
 
 export default router;

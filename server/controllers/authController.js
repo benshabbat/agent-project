@@ -1,5 +1,7 @@
 import Agent from "../models/Agent.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
 const atbashCipher = (str) => {
   return str
     .split("")
@@ -19,7 +21,7 @@ const atbashCipher = (str) => {
     .join("");
 };
 
-//register 
+//register
 export const register = async (req, res) => {
   const { agentCode, fullName, ...rest } = req.body;
   if (!agentCode || !fullName) {
@@ -40,11 +42,37 @@ export const register = async (req, res) => {
     ...rest,
   });
 
-  res
-    .status(200)
-    .json({
-      message: "Registration successful",
-      yourFirstPassword: passwordAtbash,
+  res.status(200).json({
+    message: "Registration successful",
+    yourFirstPassword: passwordAtbash,
+  });
+};
 
-    });
+export const login = async (req, res) => {
+  const { agentCode, password } = req.body;
+  if (!agentCode || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  const agent = await Agent.findOne({ agentCode });
+  if (!agent) {
+    return res.status(400).json({ message: "Invalid agent code or password" });
+  }
+  const isMatch = await bcrypt.compare(password, agent.passwordHash);
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid agent code or password" });
+  }
+
+  const token = jwt.sign(
+    { id: agent._id, agentCode: agent.agentCode },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" },
+  );
+  res
+    .cookie("token", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 3600000,
+    })
+    .status(200)
+    .json({id: agent._id });
 };

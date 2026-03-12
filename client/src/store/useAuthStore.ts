@@ -1,10 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { loginRequest, type LoginForm } from '../services/authServices';
+import {getAgentRequest} from "../services/agentServices"
+
 
 type Role = "admin"|"agent"
 
-interface User{
+interface Agent{
   id:string;
   role:Role;
   agentCode:string;
@@ -12,12 +14,14 @@ interface User{
 }
 
 interface AuthState {
-  user:User|null;
-  login: (form:LoginForm)=> Promise<User|null|unknown>;
+  agentState:Agent|null;
+  login: (form:LoginForm)=> Promise<Agent|string|null|unknown>;
+  getAgent: (id:string)=> Promise<Agent|null|unknown>;
 }
 
 
 export const useAuthStore = create<AuthState>()(persist((set)=>({
-  user: null,
-  login : async (form:LoginForm) =>set({ user: await loginRequest(form)}),
+  agentState: null,
+  login : async (form:LoginForm) =>set({ agentState: await loginRequest(form)}),
+  getAgent : async (id:string) =>set({ agentState: await getAgentRequest(id)})
 }), {name: 'auth-storage'}))

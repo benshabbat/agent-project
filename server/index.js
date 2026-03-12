@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoute from "./routes/authRoute.js";
 import cookieParser from "cookie-parser";
+import agentRoute from "./routes/agentRoute.js";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api/auth",authRoute );
+app.use("/api/agent",agentRoute );
 
 // Routes
 app.get("/", (req, res) => {
