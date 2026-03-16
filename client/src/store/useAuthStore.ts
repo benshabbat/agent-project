@@ -22,6 +22,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(persist((set)=>({
   agentState: null,
+  reports :[],
   login : async (form:LoginForm) =>set({ agentState: await loginRequest(form)}),
   getAgent : async (id:string) =>set({ agentState: await getAgentRequest(id)})
 }), {name: 'auth-storage'}))
